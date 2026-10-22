@@ -1,0 +1,100 @@
+README tetris
+
+OVERVIEW:
+    Tetris has 5 Java Classes (not including Constants, App, or CpuTimeTracker),
+    and they interact in the following ways:
+        - PaneOrganizer manages and adds/removes all graphical elements of the screen.
+        PaneOrganizer instantiates Game in it's constructor. It also passes gamePane
+        into the game, which allows elements to be added without give game access
+        to PaneOrganizer.
+        - Game is the top level class that controls the maine game logic. This means it
+        detects all key inputs, sets up and handles the timeline, generates the pieces. It
+        is also in charge of creating labels and handling pause/gameOver logic. When the game
+        is paused, the timeline is also paused.
+        Additionally, game handles restart logic an updates the difficulty of the game depending
+        on score.
+        - The board class manages all logic related to the board and the pieces as a system.
+        This creates the distinction between board and piece, as piece is solely responsible
+        for individual piece logic. Apart from creating the actual board, board hold the
+        important isOccupied 2D array, this array stores every block from every piece in an
+        occupied space, which is important for collision, line clearing, and piece movement.
+        The board also has several nested for-loops that are responsible for line clearing
+        and moving blocks above the cleared line down.
+        - The piece class is responsible for every newly generated piece's logic.
+        This includes movement based on key inputs: horizontal, rotational, and instant
+        drop, as well as, the constant falling mechanic called by the timeline's keyframe
+        duration. As a result of this, piece knows of Game. Most of this logic is controlled
+        by collision, so piece also knows of board.
+        - Block is what every piece is made up of. Each block is the same square created
+        using a javaFX rectangle. This makes block a wrapper class that enhances the
+        rectangle's customization, as well as serving as a buffer between tetris classes
+        and javaFX classes. Each block has several getters and setters to maintain its
+        wrapper nature, and is made to glow using javaFX effects.
+
+DESIGN CHOICES:
+        - Logically it would make sense for Board to be in charge of piece generation.
+        However, because game needs to have the key input switch and the timeline, this
+        would cause board to have several small and repetitive "carry-on" methods that
+        essentially call the same exact method in piece serving as a sort of bridge
+        between game and piece. This is bad design, so piece generation was moved directly
+        to Game.
+        - Board and Piece have similar logic, however, to maintain their functions separate
+        and clean, board solely focuses on whole group logic dealing with occupied spaces,
+        line clearing, and border generation, while piece on focused on movement and
+        single-piece specific things.
+        - To make my game look different from other tetris games, I made the border red
+        (which fits the accessibility metrics) as well as removed stroke. I then added
+        a glow using the dropShadow javaFX effect which makes the pieces look neon.
+        - To make the labels for score, level, and difficulty show up on top of the board,
+        I made a special pane for them in game using an HBox. PaneOrganizer is responsible
+        for all top-level graphical elements, but to maintain Game's lack of knowledge of
+        paneOrganizer, this pane was essential for making the labels appear.
+        - Because a lot of logic in piece is repeated, such as horizontal movement and
+        checking for next piece occupancy, several initial methods were combined into
+        one. Instead of having two separate methods for x and y movement, I made one
+        that takes in a direction variable in the form of an int. And since the dropping
+        down mechanic and the horizontal movement both check for block occupancy in similar
+        ways, I made a method in board that accomplishes that and returns a boolean.
+
+EXTRA CREDIT:
+        - Restart: The game can be restarted at anytime. This was difficult to achieve
+        because sometimes pieces would stack over each other and leave permanent blocks
+        on the board. I fixed this by creating a new board everytime the game was restarted
+        removing all pieces and blocks completely.
+        - Progressive Difficulty: Line clearing now determines your level, which is
+        displayed on the screen. The higher the level, the lower the duration of each
+        keyframe in the timeline, making the pieces fall faster and making the game
+        more difficult. Using Math.max, the speed caps out at a duration of 0.15 seconds
+        per keyframe.
+        - Manual Difficulty: Aside from progressive difficulty, the player can also
+        manually set the difficulty of the game to be easy, medium, or hard. Each setting
+        corresponds with 1 2 3 key input. This mechanic works in tandem with progressive
+        difficulty.
+        - Lines Cleared: The Score, level, and lines cleared are tracked. Lines cleared
+        specifically shows up on the gameOver screen.
+        - Energy Consumption: (See note below)
+
+SRC:
+        - Because the game uses 7 different pieces, each color needs to  contrast with each
+        other while passing the Web Content Accessibility Guidelines (WCAG) 2.1. To achieve
+        this I chose some unique colors and plugged each of them into https://contrast-ratio.org/
+        I did this until all my colors passed the ratio test while also contrasting with each
+        other.
+
+SRC ENERGY CONSUMPTION:
+        - CPU Time: 2.938 seconds
+          Estimated Energy Usage: 132.188 watt seconds/joules
+        - CPU Time: 2.188 seconds
+          Estimated Energy Usage: 98.438 watt seconds/joules
+        - CPU Time: 1.578 seconds
+          Estimated Energy Usage: 71.016 watt seconds/joules
+        - Average Consumption: About 70.075 J
+        - A smartphone charging draws about 5 W, so this energy could charge it for
+         about 14 seconds. A Laptop running is about 60 W so it could run one for around 2
+         seconds. An LED light bulb could produce 7 seconds of light because its power
+         is about 10 W.
+
+KNOWN BUGS: N/A
+
+How many hours did you spend on this assignment?
+Answer: 20 hours
